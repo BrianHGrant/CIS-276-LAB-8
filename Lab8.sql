@@ -159,14 +159,32 @@ IF EXISTS (SELECT name FROM sys.objects WHERE name = 'ValidateQty')
 GO
 
 CREATE PROCEDURE ValidateQty 
+	@vQty SMALLINT,
+	@vValidQty CHAR(5) OUTPUT
 AS 
 BEGIN 
--- No query required; test for positive value
+	SET @vValidQty = 'FALSE'
+	IF (@vQty > 0)
+		BEGIN
+			SET @vValidQty = 'True'
+		END;
+	--ENDIF 
 END;
 GO
 
 -- testing block for ValidateQty
-BEGIN    
+BEGIN 
+   DECLARE @vQtyIsValid CHAR(5);
+
+   EXECUTE ValidateQty 5, @vQtyIsValid OUTPUT;
+   PRINT 'When valid Qty 5 is entered for Order Qty will return ' + @vQtyIsValid;
+
+   EXECUTE ValidateQty 0, @vQtyIsValid OUTPUT;
+   PRINT 'When invalid Qty 0 is entered for Order Qty will return ' + @vQtyIsValid;
+
+   EXECUTE ValidateQty 0, @vQtyIsValid OUTPUT;
+   PRINT 'When invalid Qty -9 is entered for Order Qty will return ' + @vQtyIsValid;
+
 END;
 GO
 
@@ -182,15 +200,27 @@ IF EXISTS (SELECT name FROM sys.objects WHERE name = 'GetNewDetail')
     BEGIN DROP PROCEDURE GetNewDetail; END;
 GO
 
-CREATE PROCEDURE GetNewDetail 
+CREATE PROCEDURE GetNewDetail
+	@vOrderID SMALLINT,
+	@vNewDetail SMALLINT OUTPUT
+
 AS 
-BEGIN 
--- Use @vOrderid (input) to get @vNewDetail (output) via a query;
+BEGIN
+	
+	SET @vNewDetail = 0;
+	SELECT @vNewDetail = ISNULL((MAX(OI.Detail)+1), 1)
+	FROM ORDERITEMS OI
+	WHERE OI.OrderID = @vOrderID;
 END;
 GO
 
 -- testing block for GetNewDetail
-BEGIN    
+BEGIN
+	DECLARE @vDetailNew SMALLINT;
+	
+	EXECUTE GetNewDetail 6099, @vDetailNew OUTPUT;
+	PRINT 'When valid OrderID 6099 entered, will return max detail + 1 which is ' + CONVERT(VARCHAR(5), @vDetailNew);
+
 END;
 GO
 
