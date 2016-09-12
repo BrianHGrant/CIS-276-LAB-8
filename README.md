@@ -1,5 +1,5 @@
 # Lab 8
-A homework assignment for a complete program written in Transact SQL
+A homework assignment for a complete program written in Transact SQL. Shows the usage of triggers, stored procedures, and validation checks.
 ## Installation
 Clone repo
 ## Usage
